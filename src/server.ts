@@ -1,12 +1,23 @@
 import { resolve } from 'node:path';
 
+import { fastifyView } from '@fastify/view';
+
 import fastify from 'fastify';
+import handlebars from 'handlebars';
 
 import { FileOps } from './logic';
 
 const path = resolve(__dirname, '..', 'data', 'sample.txt');
 
 const server = fastify({ logger: true });
+
+server.register(fastifyView, {
+  engine: { handlebars },
+  root: resolve(__dirname, 'views'),
+  includeViewExtension: true,
+});
+
+server.get('/', (_req, rep) => rep.view('index'));
 
 server.get('/characters', async (_req, rep) => {
   const fileOps = new FileOps(path);
