@@ -8,12 +8,26 @@ const path = resolve(__dirname, '..', 'data', 'sample.txt');
 
 const server = fastify({ logger: true });
 
-server.get('/characters', (_req, rep) => {
-  rep.code(501).send({ statusCode: 501, message: 'Not Implemented Yet.' });
+server.get('/characters', async (_req, rep) => {
+  const fileOps = new FileOps(path);
+  try {
+    const message = await fileOps.countCharacters();
+    return rep.code(200).send({ statusCode: 200, message });
+  } catch (error) {
+    server.log.error(error);
+    return rep.code(500).send({ statusCode: 500, message: error.name });
+  }
 });
 
-server.get('/words', (_req, rep) => {
-  rep.code(501).send({ statusCode: 501, message: 'Not Implemented Yet.' });
+server.get('/words', async (_req, rep) => {
+  const fileOps = new FileOps(path);
+  try {
+    const message = await fileOps.countWords();
+    return rep.code(200).send({ statusCode: 200, message });
+  } catch (error) {
+    server.log.error(error);
+    return rep.code(500).send({ statusCode: 500, message: error.name });
+  }
 });
 
 server.get('/sentences', async (_req, rep) => {
