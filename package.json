@@ -1,0 +1,24 @@
+{
+  "name": "wsd-text-analyzer",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "nodemon src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js"
+  },
+  "author": {
+    "name": "Rumon",
+    "email": "contact@msrumon.com",
+    "url": "https://www.msrumon.com"
+  },
+  "license": "Unlicense",
+  "dependencies": {
+    "fastify": "^4.26.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.10",
+    "nodemon": "^3.0.3",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
