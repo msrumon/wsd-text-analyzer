@@ -8,20 +8,40 @@ export class FileOps {
    * @returns The number of paragraphs
    */
   async countParagraphs() {
-    const stream = createReadStream(this._path);
+    const stream = createReadStream(this._path, 'ascii');
     return new Promise<number>((resolve, reject) => {
-      let count = 0;
+      let count = NaN;
       stream.on('error', reject);
-      stream.on('data', (buffer) => {
-        let i = -1;
-        do {
-          i = buffer.indexOf('10', i + 1);
-          count += 1;
-        } while (i !== -1);
+      stream.on('data', (buffer: string) => {
+        const parts = this._format(buffer).split(/\n/);
+        count = parts.length;
       });
       stream.on('end', () => {
         resolve(count);
       });
     });
+  }
+
+  /**
+   * Counts the number of sentences in a file
+   * @returns The number of sentences
+   */
+  async countSentences() {
+    const stream = createReadStream(this._path, 'ascii');
+    return new Promise<number>((resolve, reject) => {
+      let count = NaN;
+      stream.on('error', reject);
+      stream.on('data', (buffer: string) => {
+        const parts = this._format(buffer).split(/\.[\s\n]/g);
+        count = parts.length;
+      });
+      stream.on('end', () => {
+        resolve(count);
+      });
+    });
+  }
+
+  private _format(string: string) {
+    return string.trim().replace(/^\s*\n/gm, '');
   }
 }

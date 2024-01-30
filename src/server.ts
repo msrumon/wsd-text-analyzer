@@ -1,6 +1,10 @@
+import { resolve } from 'node:path';
+
 import fastify from 'fastify';
 
 import { FileOps } from './logic';
+
+const path = resolve(__dirname, '..', 'data', 'sample.txt');
 
 const server = fastify({ logger: true });
 
@@ -12,12 +16,19 @@ server.get('/words', (_req, rep) => {
   rep.code(501).send({ statusCode: 501, message: 'Not Implemented Yet.' });
 });
 
-server.get('/sentences', (_req, rep) => {
-  rep.code(501).send({ statusCode: 501, message: 'Not Implemented Yet.' });
+server.get('/sentences', async (_req, rep) => {
+  const fileOps = new FileOps(path);
+  try {
+    const message = await fileOps.countSentences();
+    return rep.code(200).send({ statusCode: 200, message });
+  } catch (error) {
+    server.log.error(error);
+    return rep.code(500).send({ statusCode: 500, message: error.name });
+  }
 });
 
 server.get('/paragraphs', async (_req, rep) => {
-  const fileOps = new FileOps(`${__dirname}/../data/sample.txt`);
+  const fileOps = new FileOps(path);
   try {
     const message = await fileOps.countParagraphs();
     return rep.code(200).send({ statusCode: 200, message });
