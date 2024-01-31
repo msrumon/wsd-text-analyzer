@@ -63,8 +63,15 @@ server.get('/paragraphs', async (_req, rep) => {
   }
 });
 
-server.get('/longest-words', (_req, rep) => {
-  rep.code(501).send({ statusCode: 501, message: 'Not Implemented Yet.' });
+server.get('/longest-words', async (_req, rep) => {
+  const fileOps = new FileOps(path);
+  try {
+    const message = await fileOps.countLongWords();
+    return rep.code(200).send({ statusCode: 200, message });
+  } catch (error) {
+    server.log.error(error);
+    return rep.code(500).send({ statusCode: 500, message: error.name });
+  }
 });
 
 server.listen({ port: 8080, host: '0.0.0.0' });

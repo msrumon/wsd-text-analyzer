@@ -1,5 +1,9 @@
 import { createReadStream } from 'node:fs';
 
+interface LongestWords {
+  [key: number]: Array<string>;
+}
+
 export class FileOps {
   constructor(private readonly _path: string) {}
 
@@ -77,6 +81,31 @@ export class FileOps {
       });
       stream.on('end', () => {
         resolve(count);
+      });
+    });
+  }
+
+  /**
+   * Counts the longest words in all paragraphs in a file
+   * @returns The list of numbers of words
+   */
+  async countLongWords() {
+    const stream = createReadStream(this._path, 'ascii');
+    return new Promise<LongestWords>((resolve, reject) => {
+      const mapping: LongestWords = {};
+      stream.on('error', reject);
+      stream.on('data', (buffer: string) => {
+        const paragraphs = this._format(buffer).split(/\n/g);
+        paragraphs.forEach((elm, idx) => {
+          const words = elm.replace(/[^a-z\s]/g, '').split(/[\s]/g);
+          words.sort((a, b) => b.length - a.length);
+          mapping[idx + 1] = words.filter(
+            (elm, _idx, arr) => elm.length === arr[0].length
+          );
+        });
+      });
+      stream.on('end', () => {
+        resolve(mapping);
       });
     });
   }
