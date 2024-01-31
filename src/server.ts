@@ -1,23 +1,19 @@
 import { resolve } from 'node:path';
 
-import { fastifyView } from '@fastify/view';
+import fastifySwagger from '@fastify/swagger';
+import fastifySwaggerUi from '@fastify/swagger-ui';
 
 import fastify from 'fastify';
-import handlebars from 'handlebars';
 
 import { FileOps } from './logic';
+import { swaggerConfig, swaggerUiConfig } from './swagger';
 
 const path = resolve(__dirname, '..', 'data', 'sample.txt');
 
 const server = fastify({ logger: true });
 
-server.register(fastifyView, {
-  engine: { handlebars },
-  root: resolve(__dirname, 'views'),
-  includeViewExtension: true,
-});
-
-server.get('/', (_req, rep) => rep.view('index'));
+server.register(fastifySwagger, swaggerConfig);
+server.register(fastifySwaggerUi, swaggerUiConfig);
 
 server.get('/characters', async (_req, rep) => {
   const fileOps = new FileOps(path);
